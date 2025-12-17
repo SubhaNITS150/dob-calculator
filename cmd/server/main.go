@@ -26,11 +26,13 @@ func main() {
 
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://127.0.0.1:3000",
+		AllowOrigins: "*",
+		// Enabled cors origin from everywhere, in produvtion we dont do that
 		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
 		AllowHeaders: "Origin, Content-Type, Accept",
 	}))
 	routes.Setup(app, handler)
+	
 
 	log.Println("Server listening on port 8090")
 	log.Fatal(app.Listen(":8090"))
