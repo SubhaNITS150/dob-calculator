@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Registration</title>
+    <style>
+      :root {
+        --primary: #4f46e5;
+        --error: #ef4444;
+        --success: #10b981;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        background: #f9fafb;
+        display: grid;
+        place-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      .card {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        width: 100%;
+        max-width: 350px;
+      }
+
+      h2 {
+        margin-bottom: 1.5rem;
+        color: #111827;
+        text-align: center;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+      }
+
+      input {
+        width: 100%;
+        padding: 0.6rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        box-sizing: border-box;
+      }
+
+      button {
+        width: 100%;
+        padding: 0.75rem;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 1rem;
+      }
+
+      button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      #ageBtn {
+        background: var(--success);
+      }
+
+      #message {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        display: none;
+        white-space: pre-line;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card">
+      <h2>Register User</h2>
+
+      <form id="userForm">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            placeholder="Enter full name"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="dob">Date of Birth</label>
+          <input type="date" id="dob" name="dob" required />
+        </div>
+
+        <button type="submit" id="btn">Submit</button>
+        <button type="button" id="ageBtn">Calculate My Age</button>
+      </form>
+
+      <div id="message"></div>
+    </div>
+
+    <script>
+      const form = document.getElementById("userForm");
+      const msg = document.getElementById("message");
+      const btn = document.getElementById("btn");
+      const ageBtn = document.getElementById("ageBtn");
+
+      // Store age returned from API
+      let apiAge = null;
+
+      // ---------- FORM SUBMIT ----------
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        msg.style.display = "none";
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+
+        const payload = {
+          name: document.getElementById("name").value.trim(),
+          dob: document.getElementById("dob").value,
+        };
+
+        try {
+          const response = await fetch("http://localhost:8090/users", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              result.error || result.message || "Something went wrong"
+            );
+          }
+
+          // Save age from API
+          apiAge = result.age;
+
+          msg.style.display = "block";
+          msg.style.background = "#ecfdf5";
+          msg.style.color = "#065f46";
+          msg.innerText = `User created successfully!
+ID: ${result.id}
+Name: ${result.name}
+DOB: ${result.dob}`;
+
+          form.reset();
+        } catch (err) {
+          msg.style.display = "block";
+          msg.style.background = "#fef2f2";
+          msg.style.color = "#991b1b";
+          msg.innerText = err.message;
+        } finally {
+          btn.disabled = false;
+          btn.innerText = "Submit";
+        }
+      });
+
+      // ---------- SHOW AGE FROM API ----------
+      ageBtn.addEventListener("click", () => {
+        if (apiAge === null) {
+          msg.style.display = "block";
+          msg.style.background = "#fef2f2";
+          msg.style.color = "#991b1b";
+          msg.innerText =
+            "Please submit the form first to calculate age from the server.";
+          return;
+        }
+
+        msg.style.display = "block";
+        msg.style.background = "#ecfdf5";
+        msg.style.color = "#065f46";
+        msg.innerText = `Your age is ${apiAge} years.`;
+      });
+    </script>
+  </body>
+</html>
