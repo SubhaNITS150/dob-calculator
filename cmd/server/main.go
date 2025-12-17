@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/SubhaNITS150/dob-calculator/config"
 	"github.com/SubhaNITS150/dob-calculator/internal/handler"
@@ -33,7 +34,11 @@ func main() {
 	}))
 	routes.Setup(app, handler)
 	
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal("PORT environment variable not set")
+	}
 
-	log.Println("Server listening on port 8090")
-	log.Fatal(app.Listen(":8090"))
+	log.Println("Server listening on port", port)
+	log.Fatal(app.Listen(":" + port))
 }
