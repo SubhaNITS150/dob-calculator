@@ -120,8 +120,8 @@
       const btn = document.getElementById("btn");
       const ageBtn = document.getElementById("ageBtn");
 
-      // Store age returned from API
-      let apiAge = null;
+      // ✅ Store user ID returned from API
+      let userId = null;
 
       // ---------- FORM SUBMIT ----------
       form.addEventListener("submit", async (e) => {
@@ -139,22 +139,18 @@
         try {
           const response = await fetch("http://localhost:8090/users", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
           });
 
           const result = await response.json();
 
           if (!response.ok) {
-            throw new Error(
-              result.error || result.message || "Something went wrong"
-            );
+            throw new Error(result.message || "Something went wrong");
           }
 
-          // Save age from API
-          apiAge = result.age;
+          // ✅ SAVE USER ID
+          userId = result.id;
 
           msg.style.display = "block";
           msg.style.background = "#ecfdf5";
@@ -176,22 +172,76 @@ DOB: ${result.dob}`;
         }
       });
 
-      // ---------- SHOW AGE FROM API ----------
-      ageBtn.addEventListener("click", () => {
-        if (apiAge === null) {
-          msg.style.display = "block";
-          msg.style.background = "#fef2f2";
-          msg.style.color = "#991b1b";
-          msg.innerText =
-            "Please submit the form first to calculate age from the server.";
+      // ---------- CALCULATE AGE ----------
+      ageBtn.addEventListener("click", async () => {
+        if (!userId) {
+          showPopup("Please submit the form first.");
           return;
         }
 
-        msg.style.display = "block";
-        msg.style.background = "#ecfdf5";
-        msg.style.color = "#065f46";
-        msg.innerText = `Your age is ${apiAge} years.`;
+        try {
+          const response = await fetch(`http://localhost:8090/users/${userId}`);
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch age");
+          }
+
+          // ✅ SHOW AGE IN POPUP
+          showPopup(`Your age is ${result.age} years`);
+        } catch (err) {
+          showPopup(err.message);
+        }
       });
+
+      // ---------- POPUP MODAL ----------
+      function showPopup(text) {
+        const modal = document.createElement("div");
+        modal.style.position = "fixed";
+        modal.style.top = "0";
+        modal.style.left = "0";
+        modal.style.width = "100vw";
+        modal.style.height = "100vh";
+        modal.style.background = "rgba(0,0,0,0.6)";
+        modal.style.display = "flex";
+        modal.style.alignItems = "center";
+        modal.style.justifyContent = "center";
+        modal.style.zIndex = "9999";
+
+        const box = document.createElement("div");
+        box.style.width = "80%";
+        box.style.height = "80%";
+        box.style.background = "white";
+        box.style.borderRadius = "12px";
+        box.style.display = "flex";
+        box.style.flexDirection = "column";
+        box.style.alignItems = "center";
+        box.style.justifyContent = "center";
+        box.style.fontSize = "1.5rem";
+        box.style.fontWeight = "600";
+        box.style.color = "#111827";
+        box.style.position = "relative";
+
+        const closeBtn = document.createElement("button");
+        closeBtn.innerText = "Close";
+        closeBtn.style.position = "absolute";
+        closeBtn.style.top = "20px";
+        closeBtn.style.right = "20px";
+        closeBtn.style.padding = "0.5rem 1rem";
+        closeBtn.style.border = "none";
+        closeBtn.style.borderRadius = "6px";
+        closeBtn.style.background = "#ef4444";
+        closeBtn.style.color = "white";
+        closeBtn.style.cursor = "pointer";
+
+        closeBtn.onclick = () => modal.remove();
+
+        box.innerText = text;
+        box.appendChild(closeBtn);
+        modal.appendChild(box);
+        document.body.appendChild(modal);
+      }
     </script>
   </body>
 </html>
