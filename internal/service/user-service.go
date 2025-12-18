@@ -29,6 +29,6 @@ func MapUserFromSQLC(
 		ID:   id,
 		Name: name,
 		DOB:  dob.Format("2006-01-02"),
-		Age:  CalculateAge(dob),
+		// Age:  CalculateAge(dob),
 	}
 }
