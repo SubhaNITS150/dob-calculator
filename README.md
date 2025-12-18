@@ -69,6 +69,15 @@ Run the terminal client on a separate terminal
 | :-------- | :------- | :------------------------- |
 | `_` | `_` | Checks if the server is running |
 
+#### Get a user with id
+```http
+  GET /users/{id}
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `_`      | `_` | Fetches the user with calculated age |
+
 #### Get all items
 
 ```http
@@ -79,7 +88,7 @@ Run the terminal client on a separate terminal
 | :-------- | :------- | :-------------------------------- |
 | `_`      | `_` | Fetches all users with calculated age |
 
-#### Creates a new user and returns the user details along with the calculated age.
+#### Creates a new user and returns the user details.
 
 ```http
   POST /users
