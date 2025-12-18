@@ -59,3 +59,13 @@ func (r *UserRepository) List(
 
 	return r.q.ListUsers(ctx)
 }
+
+func (r *UserRepository) GetByID(ctx context.Context, id uuid.UUID) (*sqlc.GetUserByIDRow, error) {
+	user, err := r.q.GetUserByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+

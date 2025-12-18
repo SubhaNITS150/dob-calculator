@@ -124,7 +124,32 @@ func (h *UserHandler) List(c *fiber.Ctx) error {
 	return c.JSON(res)
 }
 
+// ================= GET USER BY ID =================
+func (h *UserHandler) GetByID(c *fiber.Ctx) error {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return fiber.NewError(
+			fiber.StatusBadRequest,
+			"invalid user id",
+		)
+	}
+
+	user, err := h.repo.GetByID(c.Context(), id)
+	if err != nil {
+		return fiber.ErrNotFound
+	}
+
+	age := service.CalculateAge(user.Dob)
+
+	return c.JSON(fiber.Map{
+		"id":   user.ID,
+		"name": user.Name,
+		"dob":  user.Dob.Format("2006-01-02"),
+		"age":  age,
+	})
+}
+
 // ================= HEALTH= =================
-func (h* UserHandler) Health(c *fiber.Ctx) error {
+func (h *UserHandler) Health(c *fiber.Ctx) error {
 	return c.SendString("OK")
 }

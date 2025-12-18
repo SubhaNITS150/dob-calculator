@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func calculateAge(dob time.Time) int {
+func CalculateAge(dob time.Time) int {
 	now := time.Now()
 	age := now.Year() - dob.Year()
 
@@ -29,6 +29,6 @@ func MapUserFromSQLC(
 		ID:   id,
 		Name: name,
 		DOB:  dob.Format("2006-01-02"),
-		Age:  calculateAge(dob),
+		Age:  CalculateAge(dob),
 	}
 }

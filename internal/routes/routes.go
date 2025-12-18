@@ -10,5 +10,6 @@ func Setup(app *fiber.App, h *handler.UserHandler) {
 	app.Put("/users/:id", h.Update)
 	app.Delete("/users/:id", h.Delete)
 	app.Get("/users", h.List)
+	app.Get("/users/:id", h.GetByID)
 	app.Get("/health", h.Health)
 }

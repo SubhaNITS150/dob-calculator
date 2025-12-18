@@ -14,3 +14,9 @@ DELETE FROM users WHERE id = $1;
 
 -- name: ListUsers :many
 SELECT id, name, dob FROM users ORDER BY created_at DESC;
+
+
+-- name: GetUserByID :one
+SELECT id, name, dob
+FROM users
+WHERE id = $1;

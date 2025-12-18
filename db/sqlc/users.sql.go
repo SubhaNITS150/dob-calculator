@@ -45,6 +45,25 @@ func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const getUserByID = `-- name: GetUserByID :one
+SELECT id, name, dob
+FROM users
+WHERE id = $1
+`
+
+type GetUserByIDRow struct {
+	ID   uuid.UUID
+	Name string
+	Dob  time.Time
+}
+
+func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (GetUserByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserByID, id)
+	var i GetUserByIDRow
+	err := row.Scan(&i.ID, &i.Name, &i.Dob)
+	return i, err
+}
+
 const listUsers = `-- name: ListUsers :many
 SELECT id, name, dob FROM users ORDER BY created_at DESC
 `
